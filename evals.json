@@ -1,0 +1,34 @@
+{
+  "questionscanaswer": [
+    {
+      "question": "What packages do you offer for Tokyo and what does the daily itinerary look like?",
+      "expected": "Answered using the tokyo-explorer package details and its day-by-day itinerary"
+    },
+    {
+      "question": "What is your cancellation and refund policy if I cancel my trip 5 days before departure?",
+      "expected": "Answered using the cancellation FAQ: 50% refund for cancellations made 2 to 6 days prior"
+    },
+    {
+      "question": "Can you recommend a luxury hotel in Paris with rates and amenities?",
+      "expected": "Answered using Le Bristol Palace which is rated 4.9 and costs $650/night."
+    },
+    {
+      "question": "Are international flights included in the package prices?",
+      "expected": "Answered using the package inclusion FAQ which explicitly states flights are not included."
+    },
+    {
+      "question": "How do I book the Bali tour package?",
+      "expected": "Answered using the booking FAQ, providing the phone number +1-800-VELOCITY or email bookings@velocitytravels.com"
+    }
+  ],
+  "questionscannotanswer": [
+    {
+      "question": "Do you have any tour packages or hotel recommendations for London or New York?",
+      "expected": "Although New York is in the description, it is not configured in the active destinations list of travel_data.json, and London is completely missing. Per system instructions, the bot will politely decline and redirect the user to Tokyo, Paris, or Bali"
+    },
+    {
+      "question": "What is the flight number and schedule for my trip?",
+      "expected": "The database only covers land packages and accommodations, so the agent cannot provide live flight scheduling or booking information"
+    }
+  ]
+}
