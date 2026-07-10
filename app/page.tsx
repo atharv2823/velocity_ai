@@ -112,7 +112,7 @@ export default function Home() {
     const defaultSessionId = "session-1";
     const initialSession: ChatSession = {
       id: defaultSessionId,
-      title: "Velocity Travels Welcome",
+      title: "Velocity Travels",
       messages: [
         {
           id: "welcome-msg",
@@ -136,6 +136,20 @@ export default function Home() {
       .catch(() => {
         setIsOfflineMode(true);
       });
+  }, []);
+
+  // Handle responsive sidebar on resize / mount
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Sync scroll to bottom
@@ -312,6 +326,9 @@ export default function Home() {
     setSessions((prev) => [newSession, ...prev]);
     setActiveSessionId(newId);
     setActiveModeId(modeId);
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
   };
 
   const deleteSession = (id: string, e: React.MouseEvent) => {
@@ -325,7 +342,7 @@ export default function Home() {
       setSessions([
         {
           id: fallbackId,
-          title: "Velocity Travels Welcome",
+          title: "Velocity Travels",
           messages: [
             {
               id: "welcome-msg",
@@ -359,8 +376,16 @@ export default function Home() {
 
   return (
     <div className={`flex h-screen w-screen overflow-hidden font-sans ${theme === "dark" ? "bg-zinc-950 text-zinc-100 dark" : "bg-zinc-50 text-zinc-900"}`}>
+      {/* Sidebar Backdrop Overlay on Mobile */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/45 backdrop-blur-sm z-30 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className={`flex flex-col border-r border-zinc-200/50 dark:border-zinc-800/50 bg-white/70 dark:bg-zinc-900/60 backdrop-blur-md transition-all duration-300 ${isSidebarOpen ? "w-80" : "w-0 -translate-x-full md:w-0"} overflow-hidden shrink-0`}>
+      <aside className={`fixed inset-y-0 left-0 z-40 flex flex-col border-r border-zinc-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-900 md:bg-white/70 md:dark:bg-zinc-900/60 md:backdrop-blur-md transition-all duration-300 md:static ${isSidebarOpen ? "translate-x-0 w-80" : "-translate-x-full md:translate-x-0 md:w-0"} overflow-hidden shrink-0`}>
         {/* Sidebar Header */}
         <div className="p-4 border-b border-zinc-200/50 dark:border-zinc-800/50 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -434,6 +459,9 @@ export default function Home() {
                 onClick={() => {
                   setActiveSessionId(session.id);
                   setActiveModeId(session.assistantMode);
+                  if (typeof window !== "undefined" && window.innerWidth < 768) {
+                    setIsSidebarOpen(false);
+                  }
                 }}
                 className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                   isSelected
@@ -482,8 +510,8 @@ export default function Home() {
       {/* Main chat window */}
       <main className="flex-1 flex flex-col min-w-0 bg-zinc-50 dark:bg-zinc-950">
         {/* Navigation/Header bar */}
-        <header className="h-16 border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/70 dark:bg-zinc-900/60 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
-          <div className="flex items-center gap-3 min-w-0">
+        <header className="h-16 border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/70 dark:bg-zinc-900/60 backdrop-blur-md flex items-center justify-between px-4 md:px-6 shrink-0">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="p-2 rounded-lg text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
@@ -493,27 +521,29 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h12M4 18h16" />
               </svg>
             </button>
-            <div className="flex items-center gap-2 overflow-hidden">
-              <span className={`p-2 rounded-xl bg-gradient-to-tr ${activeMode.color} text-white shadow-md`}>
+            <div className="flex items-center gap-1.5 md:gap-2 overflow-hidden">
+              <span className={`p-1.5 md:p-2 rounded-xl bg-gradient-to-tr ${activeMode.color} text-white shadow-md shrink-0`}>
                 {activeMode.icon}
               </span>
               <div className="overflow-hidden">
-                <h2 className="text-sm font-bold truncate">{activeSession?.title || "Velocity Chat"}</h2>
-                <p className="text-[10px] text-zinc-500 truncate">{activeMode.tagline}</p>
+                <h2 className="text-xs md:text-sm font-bold truncate">{activeSession?.title || "Velocity Chat"}</h2>
+                <p className="text-[9px] md:text-[10px] text-zinc-500 truncate">{activeMode.tagline}</p>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {isOfflineMode ? (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                Offline Mode (Local Backups)
+              <div className="flex items-center gap-1 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] md:text-xs font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0"></span>
+                <span className="hidden sm:inline">Offline Mode (Local Backups)</span>
+                <span className="sm:hidden">Offline</span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                Agent Online
+              <div className="flex items-center gap-1 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] md:text-xs font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping shrink-0"></span>
+                <span className="hidden sm:inline">Agent Online</span>
+                <span className="sm:hidden">Online</span>
               </div>
             )}
           </div>
